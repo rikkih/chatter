@@ -19,15 +19,14 @@ class ChatConsumer(WebsocketConsumer):
         """
         Configure and accept incoming Web Socket requests from client.
         """
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = f'chat_{self.room_name}'
+        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        self.room_group_name = f"chat_{self.room_name}"
         self.room = Room.objects.get(name=self.room_name)
 
         self.accept()
 
         async_to_sync(self.channel_layer.group_add)(
-            self.room_group_name,
-            self.channel_name
+            self.room_group_name, self.channel_name
         )
 
     def disconnect(self, close_code: str) -> None:
@@ -36,17 +35,19 @@ class ChatConsumer(WebsocketConsumer):
             self.channel_name,
         )
 
-    def receive(self, text_data: str | None = None, bytes_data: bytes | None = None) -> None:
+    def receive(
+        self, text_data: str | None = None, bytes_data: bytes | None = None
+    ) -> None:
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
+        message = text_data_json["message"]
 
         # send chat message event to the room
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
-                'type': 'chat.message',
-                'message': message,
-            }
+                "type": "chat.message",
+                "message": message,
+            },
         )
 
     def chat_message(self, event: dict[str, Any]) -> None:

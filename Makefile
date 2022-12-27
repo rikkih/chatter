@@ -13,3 +13,7 @@ shell:
 .PHONY: build
 build:
 	@docker compose build
+
+.PHONY: format
+format:
+	@python -m black core/chatter/ core/core/

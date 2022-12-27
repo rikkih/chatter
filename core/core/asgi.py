@@ -14,10 +14,12 @@ from django.core.asgi import get_asgi_application
 
 from chatter import routing
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
-os.environ.setdefault('SERVER_GATEWAY_INTERFACE', 'Asynchronous')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
+os.environ.setdefault("SERVER_GATEWAY_INTERFACE", "Asynchronous")
 
-application = ProtocolTypeRouter({
-    'http': get_asgi_application(),
-    'websocket': URLRouter(routing.websocket_urlpatterns),
-})
+application = ProtocolTypeRouter(
+    {
+        "http": get_asgi_application(),
+        "websocket": URLRouter(routing.websocket_urlpatterns),
+    }
+)
