@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-&65g=9r48oqgk$m*5!sx2u-8mp*$(@a*o9iyc%z4o$9h%f5wse
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS: list[str] = ['testserver', 'localhost']
 
 # Application definition
 
@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "chatter.apps.ChatterConfig",
     "daphne",
     "channels",
+    "rest_framework",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

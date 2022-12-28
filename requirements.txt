@@ -15,6 +15,7 @@ cryptography==38.0.4
 daphne==4.0.0
 decorator==5.1.1
 Django==4.1.4
+djangorestframework==3.14.0
 executing==1.2.0
 flake8==6.0.0
 greenlet==2.0.1
@@ -46,6 +47,7 @@ pyflakes==3.0.1
 Pygments==2.13.0
 pynvim==0.4.3
 pyOpenSSL==22.1.0
+pytz==2022.7
 redis==4.4.0
 service-identity==21.1.0
 six==1.16.0

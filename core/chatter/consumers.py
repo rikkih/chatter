@@ -1,11 +1,10 @@
 import json
-import sys
 from typing import Any
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
-from .models import Room
+from .models import Message, Room
 
 
 class ChatConsumer(WebsocketConsumer):
@@ -14,6 +13,7 @@ class ChatConsumer(WebsocketConsumer):
         self.room_name = None
         self.room_group_name = None
         self.room = None
+        self.user = None
 
     def connect(self) -> None:
         """
@@ -22,6 +22,7 @@ class ChatConsumer(WebsocketConsumer):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
         self.room = Room.objects.get(name=self.room_name)
+        self.user = self.scope['user']
 
         self.accept()
 
@@ -41,11 +42,15 @@ class ChatConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
 
+        if not self.user.is_authenticated:
+            return
+
         # send chat message event to the room
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
                 "type": "chat.message",
+                "user": self.user.username,
                 "message": message,
             },
         )
