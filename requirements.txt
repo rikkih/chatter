@@ -59,4 +59,5 @@ txaio==22.2.1
 typing_extensions==4.4.0
 wcwidth==0.2.5
 websockets==10.4
+whitenoise==6.2.0
 zope.interface==5.5.2
