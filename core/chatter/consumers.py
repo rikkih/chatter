@@ -21,8 +21,8 @@ class ChatConsumer(WebsocketConsumer):
         """
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
-        self.room = Room.objects.get(name=self.room_name)
-        self.user = self.scope['user']
+        self.room = Room.objects.get(name=self.room_name)  # Synchronous DB call
+        self.user = self.scope["user"]
 
         self.accept()
 
@@ -30,11 +30,41 @@ class ChatConsumer(WebsocketConsumer):
             self.room_group_name, self.channel_name
         )
 
+        self.send(
+            json.dumps(
+                {
+                    #  TODO: Add ENUM for chat event types.
+                    "type": "user.list",
+                    "users": [user.username for user in self.room.online.all()],
+                }
+            )
+        )
+
+        if self.user.is_authenticated:
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    "type": "user.join",
+                    "user": self.user.username,
+                },
+            )
+            self.room.online.add(self.user)
+
     def disconnect(self, close_code: str) -> None:
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name,
         )
+
+        if self.user.is_authenticated:
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    "type": "user.leave",
+                    "user": self.user.username,
+                },
+            )
+            self.room.online.remove(self.user)
 
     def receive(
         self, text_data: str | None = None, bytes_data: bytes | None = None
@@ -56,4 +86,10 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     def chat_message(self, event: dict[str, Any]) -> None:
+        self.send(text_data=json.dumps(event))
+
+    def user_join(self, event: dict[str, Any]) -> None:
+        self.send(text_data=json.dumps(event))
+
+    def user_leave(self, event: dict[str, Any]) -> None:
         self.send(text_data=json.dumps(event))
