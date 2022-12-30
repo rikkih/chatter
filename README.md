@@ -12,6 +12,6 @@ $ make build runserver
 
 Open up a browser and go to `localhost:8000/chat/`
 
-From here you can create a chatroom.
+From here you can create a chatroom, invite others with the link created, and chatter away.
 
 More functionality soon.
